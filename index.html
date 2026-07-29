@@ -646,7 +646,7 @@ html{
 
   <!-- ================= HERO VIDEO ================= -->
   <div class="hero-video">
-    <video autoplay muted playsinline poster="image.png">
+    <video id="heroVideo" autoplay muted playsinline webkit-playsinline="true" preload="auto" poster="image.png">
       <source src="video1.mp4" type="video/mp4">
       <!-- <source src="hero.webm" type="video/webm"> -->
     </video>
@@ -655,7 +655,7 @@ html{
   <!-- ================= INTRO / CTA ================= -->
   <section class="intro">
     <div class="intro-black-bg"></div>
-    <video class="intro-video-bg" autoplay muted loop playsinline>
+    <video id="introVideo" class="intro-video-bg" autoplay muted loop playsinline webkit-playsinline="true" preload="auto">
       <source src="video2.mp4" type="video/mp4">
     </video>
     <div class="intro-overlay"></div>
@@ -800,6 +800,57 @@ html{
       document.addEventListener('keydown', function(e){
         if(e.key === 'Escape'){
           closeMenu();
+        }
+      });
+    })();
+  </script>
+
+  <script>
+    /* Force le lancement automatique des vidéos (utile sur mobile où
+       certains navigateurs bloquent l'autoplay malgré les attributs
+       autoplay/muted/playsinline tant qu'aucune interaction n'a eu lieu). */
+    (function(){
+      var videos = [
+        document.getElementById('heroVideo'),
+        document.getElementById('introVideo')
+      ].filter(Boolean);
+
+      function tryPlay(video){
+        if(!video) return;
+        var playPromise = video.play();
+        if(playPromise !== undefined){
+          playPromise.catch(function(){
+            // Autoplay bloqué : on retentera au premier geste de l'utilisateur
+          });
+        }
+      }
+
+      function playAll(){
+        videos.forEach(tryPlay);
+      }
+
+      // Tentative immédiate au chargement
+      window.addEventListener('DOMContentLoaded', playAll);
+      window.addEventListener('load', playAll);
+
+      // Certains navigateurs mobiles (webviews Instagram/Facebook, mode
+      // économie de données, etc.) n'autorisent la lecture qu'après un
+      // premier tap : on relance alors la lecture une seule fois.
+      var resumeOnInteraction = function(){
+        playAll();
+        window.removeEventListener('touchstart', resumeOnInteraction);
+        window.removeEventListener('click', resumeOnInteraction);
+      };
+      window.addEventListener('touchstart', resumeOnInteraction, { once: true, passive: true });
+      window.addEventListener('click', resumeOnInteraction, { once: true });
+
+      // Relance la lecture si la page redevient visible (ex: retour d'un
+      // autre onglet/app) et que la vidéo s'était mise en pause.
+      document.addEventListener('visibilitychange', function(){
+        if(document.visibilityState === 'visible'){
+          videos.forEach(function(v){
+            if(v.paused) tryPlay(v);
+          });
         }
       });
     })();
