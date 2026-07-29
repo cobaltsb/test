@@ -1,0 +1,799 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Cobalt — Shop</title>
+<link rel="icon" type="image/png" href="logosansfond.png">
+<link href="//www.surf-forecast.com/stylesheets/widget.css" media="screen" rel="stylesheet" type="text/css" />
+<style>
+
+  :root{
+    --orange: #ff8c42;
+    --green: #c6f259;
+    --black: #141414;
+    --dark: #2e2e2e;
+    --white: #fdfdfd;
+    --pink: #ff69c9;
+    --grey-header: #d6d6d6;
+    --placeholder: #fbdada;
+    --font-display: 'Georgia', 'Times New Roman', serif;
+    --font-body: 'Helvetica Neue', Arial, sans-serif;
+  }
+html{
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+  *{ margin:0; padding:0; box-sizing:border-box; }
+
+  html, body{
+    max-width: 100%;
+    overflow-x: clip;
+  }
+
+  img, video, svg{
+    max-width: 100%;
+  }
+
+  body{
+    font-family: var(--font-body);
+    color: var(--black);
+    background: var(--white);
+  }
+
+  a{ color:inherit; text-decoration:none; }
+
+  /* ---------- HEADER ---------- */
+  header{
+    display:grid;
+    grid-template-columns: 1fr auto 1fr;
+    column-gap: 40px;
+    align-items:center;
+    padding: 24px 48px;
+    position: relative;
+    width: 100%;
+    min-height: 200px;
+    overflow: hidden;
+  }
+
+  .header-video-bg{
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    z-index: 0;
+  }
+
+  .header-overlay{
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0,0,0,0.35);
+    z-index: 1;
+  }
+
+  .nav-left{
+    justify-self: center;
+    display:flex;
+    align-items:center;
+    gap: 32px;
+    font-size: 14px;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: #fff;
+    text-shadow: 0 1px 4px rgba(0,0,0,0.25);
+    min-width: 0;
+    position: relative;
+    z-index: 2;
+  }
+
+  .nav-left .dropdown{
+    display:flex;
+    align-items:center;
+    gap:6px;
+    cursor:pointer;
+  }
+
+  .logo-placeholder{
+    width: 120px;
+    height: 120px;
+    object-fit: contain;
+    display: block;
+    position: relative;
+    z-index: 2;
+  }
+
+  .nav-right{
+    justify-self: center;
+    display:flex;
+    align-items:center;
+    gap: 22px;
+    color: #fff;
+    min-width: 0;
+    position: relative;
+    z-index: 2;
+  }
+
+  .nav-right button{
+    background:none;
+    border:none;
+    padding:4px;
+    display:flex;
+    color: #fff;
+    filter: drop-shadow(0 1px 4px rgba(0,0,0,0.25));
+  }
+
+  .nav-right svg{ width:20px; height:20px; }
+
+  /* ---------- HAMBURGER (masqué sur PC par défaut) ---------- */
+  .hamburger-btn{
+    display: none;
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: 6px;
+    position: relative;
+    z-index: 3;
+    justify-self: center;
+    color: #fff;
+    filter: drop-shadow(0 1px 4px rgba(0,0,0,0.25));
+  }
+
+  .hamburger-btn svg{ width: 26px; height: 26px; display:block; }
+
+  /* ---------- SLIDE MENU (mobile) ---------- */
+  .slide-menu-overlay{
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.45);
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity .3s ease;
+    z-index: 90;
+  }
+
+  .slide-menu-overlay.open{
+    opacity: 1;
+    pointer-events: auto;
+  }
+
+  .slide-menu{
+    position: fixed;
+    top: 0;
+    left: -100%;
+    width: 50%;
+    height: 100%;
+    background: var(--dark);
+    color: #fff;
+    z-index: 100;
+    transition: left .35s ease;
+    display: flex;
+    flex-direction: column;
+    overflow-y: auto;
+  }
+
+  .slide-menu.open{
+    left: 0;
+  }
+
+  .slide-menu-header{
+    display:flex;
+    justify-content:flex-end;
+    padding: 18px;
+  }
+
+  .slide-menu-close{
+    background:none;
+    border:none;
+    color:#fff;
+    cursor:pointer;
+    padding: 6px;
+  }
+
+  .slide-menu-close svg{ width:22px; height:22px; }
+
+  .slide-menu-items{
+    display:flex;
+    flex-direction:column;
+  }
+
+  .slide-menu-item{
+    padding: 22px 24px;
+    font-size: 16px;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    border-bottom: 1px solid rgba(255,255,255,0.15);
+  }
+
+  .slide-menu-item:hover{
+    background: rgba(255,255,255,0.06);
+  }
+
+  /* ---------- SHOP TITLE ---------- */
+  .shop-title{
+    text-align:center;
+    padding: 64px 20px 44px;
+  }
+
+  .shop-title h1{
+    font-family: var(--font-display);
+    font-weight: 600;
+    font-size: clamp(28px, 4vw, 40px);
+    letter-spacing: 0.02em;
+  }
+
+  /* ---------- SHOP GRID ---------- */
+  .shop-grid{
+    display:grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 80px;
+    max-width: 1400px;
+    margin: 0 auto;
+    padding: 0 48px 80px;
+  }
+
+  .shop-item{
+    display:block;
+    cursor:pointer;
+  }
+
+  /* La 4e box (dernier produit) se centre sous les 3 premières,
+     en occupant la colonne du milieu de la grille */
+  .shop-item:nth-child(4){
+    grid-column: 2 / 3;
+  }
+
+  .shop-photo{
+    position:relative;
+    width:100%;
+    aspect-ratio: 1 / 1;
+
+    border-radius: 2px;
+    overflow:hidden;
+  }
+
+  /* Les deux images (défaut + hover) partagent les mêmes attributs
+     pour que l'affichage soit identique entre les deux */
+  .shop-photo img{
+    position: absolute;
+    top: 0;
+    left: 0;
+    width:100%;
+    height:100%;
+    object-fit:cover;
+    display:block;
+  }
+
+  .shop-photo img.img-hover{
+    opacity: 0;
+  }
+
+  .shop-item:hover .shop-photo img.img-default{
+    opacity: 0;
+  }
+
+  .shop-item:hover .shop-photo img.img-hover{
+    opacity: 1;
+  }
+
+  .shop-label{
+    color: #000000;
+    padding: 14px 16px;
+    text-align:center;
+  }
+
+  .shop-name{
+    font-size: 14px;
+    font-weight: 600;
+    margin-bottom: 4px;
+  }
+
+  .shop-price{
+    font-size: 13px;
+    opacity: 0.85;
+  }
+
+  /* ---------- SURF REPORT SECTION ---------- */
+  .surf-section{
+    padding: 50px 48px 70px;
+  }
+
+  .surf-section h2{
+    font-size: 20px;
+    text-decoration: underline;
+    font-weight: 500;
+    margin-bottom: 24px;
+  }
+
+  .surf-widget{
+    display:flex;
+    align-items:stretch;
+    gap: 24px;
+    flex-wrap: wrap;
+    min-height: 220px;
+    position: relative;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    padding: 16px;
+  }
+
+  .surf-widget-item{
+    flex: 1 1 0;
+    min-width: 260px;
+    overflow: hidden;
+    display:flex;
+    flex-direction:column;
+  }
+
+  .surf-widget-item h3{
+    font-size: 13px;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    color:#666;
+    margin-bottom: 10px;
+  }
+
+  .surf-widget-item .wf-width-cont{
+    max-width: 100%;
+  }
+
+  /* Le widget externe surf-forecast a un iframe/conteneur à largeur fixe
+     par défaut : on force tout à s'adapter au parent pour éviter le débordement */
+  .surf-widget-item .widget-container,
+  .surf-widget-item .external-cont{
+    width: 100% !important;
+    max-width: 100% !important;
+  }
+
+  .surf-widget-item iframe.surf-fc-i{
+    width: 100% !important;
+    max-width: 100% !important;
+  }
+
+  .surf-widget-logo{
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    z-index: 2;
+    pointer-events: none;
+    width: 120px;
+  }
+
+  .surf-widget-logo img{
+    width: 100%;
+    height: auto;
+    display: block;
+  }
+
+  /* ---------- FOOTER ---------- */
+  footer{
+    background: var(--dark);
+    color: #fff;
+    padding: 56px 48px 28px;
+  }
+
+  .footer-grid{
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    gap: 48px;
+    padding-bottom: 40px;
+  }
+
+  .footer-links{
+    flex: 1;
+    display:flex;
+    gap: 60px;
+    font-size: 14px;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+  }
+
+  .footer-links a{
+    opacity: 0.9;
+    transition: opacity .2s ease;
+  }
+
+  .footer-links a:hover{ opacity: 1; text-decoration: underline; }
+
+  .footer-divider{
+    width: 1px;
+    align-self: stretch;
+    background: rgba(255,255,255,0.2);
+  }
+
+  .footer-contact{
+    flex: 1;
+    text-align:right;
+  }
+
+  .footer-contact h3{
+    font-size: 13px;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    margin-bottom: 14px;
+    opacity: 0.8;
+  }
+
+  .footer-contact ul{
+    list-style:none;
+  }
+
+  .footer-contact li{
+    display:flex;
+    align-items:center;
+    justify-content:flex-end;
+    gap:10px;
+    font-size: 14px;
+    margin-bottom: 10px;
+    opacity: 0.9;
+  }
+
+  .footer-contact svg{ width:16px; height:16px; flex-shrink:0; }
+
+  .footer-bottom{
+    border-top: 1px solid rgba(255,255,255,0.15);
+    padding-top: 20px;
+    text-align:center;
+    font-size: 12px;
+    opacity: 0.6;
+  }
+
+  /* ---------- RESPONSIVE ---------- */
+
+  /* Tablette */
+  @media (max-width: 900px){
+    header{ padding: 20px 28px; }
+    .nav-left{ gap: 22px; }
+    .shop-title{ padding: 48px 20px 32px; }
+    .shop-grid{ padding: 0 28px 60px; gap: 40px; }
+    .surf-section{ padding: 44px 28px 60px; }
+    footer{ padding: 48px 28px 24px; }
+    .footer-links{ gap: 40px; }
+  }
+
+  /* Mobile */
+  @media (max-width: 640px){
+    header{
+      display: flex;
+      padding: 16px 18px;
+      flex-wrap: nowrap;
+      justify-content: space-between;
+      align-items: center;
+      min-height: 90px;
+    }
+
+    /* Sur mobile : le contenu du head (liens SHOP/ABOUT/TEAM) est masqué,
+       remplacé par le bouton hamburger */
+    .nav-left{
+      display: none;
+    }
+
+    .hamburger-btn{
+      display: flex;
+    }
+
+    .logo-placeholder{ width: 64px; height: 64px; }
+    .nav-right{ gap: 16px; }
+
+    .slide-menu{ width: 50%; }
+
+    .shop-title{ padding: 36px 20px 28px; }
+    .shop-title h1{ font-size: clamp(24px, 7vw, 32px); }
+
+    /* Une seule colonne sur mobile : plus lisible qu'une grille de 3 */
+    .shop-grid{
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      padding: 0 12px 50px;
+      gap: 16px 10px;
+    }
+
+    .shop-item:nth-child(4){
+      grid-column: 1 / -1;
+      max-width: 60%;
+      margin: 0 auto;
+    }
+
+    .shop-name{ font-size: 11px; }
+    .shop-price{ font-size: 10px; }
+    .shop-label{ padding: 8px 6px; }
+
+    .surf-section{ padding: 36px 20px 44px; }
+    .surf-section h2{ font-size: 17px; margin-bottom: 18px; }
+    .surf-widget{ min-height: 180px; gap: 16px; flex-direction: column; padding: 12px; }
+    .surf-widget-item{ min-width: 100%; }
+    .surf-widget-item + .surf-widget-item{ padding-top: 16px; border-top: 1px solid #eee; }
+
+    /* Le logo centré en absolu se superpose aux deux widgets empilés :
+       on le retire du flux et on l'affiche au-dessus, en position statique */
+    .surf-widget-logo{
+      position: static;
+      transform: none;
+      width: 72px;
+      margin: 0 auto 8px;
+      order: -1;
+    }
+
+    footer{ padding: 40px 20px 20px; }
+    .footer-grid{
+      flex-direction: column;
+      align-items: flex-start;
+      gap: 28px;
+    }
+    .footer-links{
+      order: 1;
+      width: 100%;
+      justify-content: flex-start;
+      flex-wrap: wrap;
+      gap: 24px;
+    }
+    .footer-divider{ display: none; }
+    .footer-contact{
+      order: 2;
+      width: 100%;
+      text-align: left;
+    }
+    .footer-contact li{ justify-content: flex-start; }
+  }
+
+  /* Très petits écrans */
+  @media (max-width: 380px){
+    .footer-links{ gap: 18px; font-size: 12px; }
+
+    .slide-menu{ width: 70%; }
+
+    .shop-grid{
+      grid-template-columns: 1fr;
+    }
+    .shop-item:nth-child(4){
+      max-width: 100%;
+    }
+  }
+
+</style>
+</head>
+<body>
+
+  <!-- ================= HEADER ================= -->
+  <header>
+    <video class="header-video-bg" autoplay muted loop playsinline>
+      <source src="video2.mp4" type="video/mp4">
+    </video>
+    <div class="header-overlay"></div>
+
+    <!-- Bouton hamburger : visible uniquement sur mobile -->
+    <button class="hamburger-btn" id="hamburgerBtn" aria-label="Ouvrir le menu" aria-expanded="false">
+      <svg viewBox="0 0 24 24" fill="none"><path d="M3 6h18M3 12h18M3 18h18" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>
+    </button>
+
+    <div class="nav-left">
+      <div class="dropdown">
+        SHOP
+      </div>
+      <div>ABOUT</div>
+      <div>TEAM</div>
+    </div>
+
+    <!-- LOGO -->
+    <img src="logosansfond2.png" alt="Logo" class="logo-placeholder">
+
+    <div class="nav-right">
+      <button aria-label="Rechercher">
+        <svg viewBox="0 0 24 24" fill="none"><circle cx="11" cy="11" r="7" stroke="currentColor" stroke-width="1.6"/><path d="M21 21L16.5 16.5" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg>
+      </button>
+      <button aria-label="Compte">
+        <svg viewBox="0 0 24 24" fill="none"><circle cx="12" cy="8" r="4" stroke="currentColor" stroke-width="1.6"/><path d="M4 20c0-4 4-6 8-6s8 2 8 6" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg>
+      </button>
+      <button aria-label="Panier">
+        <svg viewBox="0 0 24 24" fill="none"><path d="M4 6h2l1.5 11h11L20 8H7.5" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/><circle cx="10" cy="21" r="1.2" fill="currentColor"/><circle cx="17" cy="21" r="1.2" fill="currentColor"/></svg>
+      </button>
+    </div>
+  </header>
+
+  <!-- ================= SLIDE MENU (mobile) ================= -->
+  <div class="slide-menu-overlay" id="slideMenuOverlay"></div>
+
+  <nav class="slide-menu" id="slideMenu" aria-hidden="true">
+    <div class="slide-menu-header">
+      <button class="slide-menu-close" id="slideMenuClose" aria-label="Fermer le menu">
+        <svg viewBox="0 0 24 24" fill="none"><path d="M6 6l12 12M18 6L6 18" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>
+      </button>
+    </div>
+    <div class="slide-menu-items">
+      <a class="slide-menu-item" href="#shop">SHOP</a>
+      <a class="slide-menu-item" href="#about">ABOUT</a>
+      <a class="slide-menu-item" href="#team">TEAM</a>
+    </div>
+  </nav>
+
+  <!-- ================= SHOP TITLE ================= -->
+  <div class="shop-title">
+    <h1>Shop</h1>
+  </div>
+
+  <!-- ================= SHOP GRID ================= -->
+  <div class="shop-grid">
+
+    <a class="shop-item" href="#produit-hoodie">
+      <div class="shop-photo">
+        <!-- Remplacer src par la vraie photo produit -->
+        <img class="img-default" src="placeholder-hoodie.png" alt="Faster than Death Hoodie | Black">
+        <!-- Placeholder : remplacer par la vraie image affichée au survol -->
+        <img class="img-hover" src="placeholder-hoodie-hover.png" alt="">
+      </div>
+      <div class="shop-label">
+        <div class="shop-name">Faster than Death Hoodie | Black</div>
+        <div class="shop-price">X€</div>
+      </div>
+    </a>
+
+    <a class="shop-item" href="ogshirt.html">
+      <div class="shop-photo">
+        <img class="img-default" src="ogshirt.png" alt="OG T shirt | Oxford Grey">
+        <img class="img-hover" src="ogshirt2.png" alt="">
+      </div>
+      <div class="shop-label">
+        <div class="shop-name">OG T shirt | Oxford Grey</div>
+        <div class="shop-price">X€</div>
+      </div>
+    </a>
+
+    <a class="shop-item" href="sunchshirt.html">
+      <div class="shop-photo">
+        <img class="img-default" src="sunchshirt.png" alt="Sunch T shirt | Coconut Milk">
+        <img class="img-hover" src="sunchshirt2.png" alt="">
+      </div>
+      <div class="shop-label">
+        <div class="shop-name">Sunch T shirt | Coconut Milk</div>
+        <div class="shop-price">X€</div>
+      </div>
+    </a>
+
+    <a class="shop-item" href="#produit-cap">
+      <div class="shop-photo">
+        <img class="img-default" src="placeholder-cap.png" alt="Faster than Death Cap | Black">
+        <img class="img-hover" src="placeholder-cap-hover.png" alt="">
+      </div>
+      <div class="shop-label">
+        <div class="shop-name">Faster than Death Cap | Black</div>
+        <div class="shop-price">X€</div>
+      </div>
+    </a>
+
+  </div>
+
+  <!-- ================= SURF REPORT (widget surf-forecast.com) ================= -->
+  <section class="surf-section">
+    <h2><a href="#surf-report">Surf report - west coast</a></h2>
+
+    <div class="surf-widget" id="surf-widget">
+
+      <!-- Logo centré, entre les deux boîtes (repasse au-dessus en pile sur mobile) -->
+      <div class="surf-widget-logo">
+        <img src="logosansfond.png" alt="Logo">
+      </div>
+
+      <!-- Boîte 1 : Ile d'Oléron - Grand Village -->
+      <div class="surf-widget-item">
+        <h3>Ile d'Oléron — Grand Village</h3>
+        <div class="wf-width-cont surf-fc-widget widget-centered">
+          <div class="widget-container">
+            <div class="external-cont">
+              <iframe class="surf-fc-i" allowtransparency="true" src="//www.surf-forecast.com/breaks/Oleron-Grand-Village/forecasts/widget/a" scrolling="no" frameborder="0" marginwidth="0" marginheight="0"></iframe>
+              <div class="footer">
+                <a class="logo" href="//www.surf-forecast.com/"><img src="//www.surf-forecast.com/images/widget.png" width="1" height="1" /></a>
+                <div class="about" id="cmt">More <a href="//www.surf-forecast.com/breaks/Oleron-Grand-Village">Detailed Surf Conditions &amp; Webcams for&nbsp;Ile d'Oleron - Grand Village</a> <nobr>at&nbsp;<a href="//www.surf-forecast.com/">surf-forecast.com</a></nobr>.</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Boîte 2 : Côte Sauvage - La Pointe Espagnole -->
+      <div class="surf-widget-item">
+        <h3>Côte Sauvage — La Pointe Espagnole</h3>
+        <div class="wf-width-cont surf-fc-widget widget-centered">
+          <div class="widget-container">
+            <div class="external-cont">
+              <iframe class="surf-fc-i" allowtransparency="true" src="//www.surf-forecast.com/breaks/Cote-Sauvage-la-Pointe-Espagnole/forecasts/widget/a" scrolling="no" frameborder="0" marginwidth="0" marginheight="0"></iframe>
+              <div class="footer">
+                <a class="logo" href="//www.surf-forecast.com/"><img src="//www.surf-forecast.com/images/widget.png" width="1" height="1" /></a>
+                <div class="about" id="cmt">More <a href="//www.surf-forecast.com/breaks/Cote-Sauvage-la-Pointe-Espagnole">Detailed Surf Conditions &amp; Webcams for&nbsp;La Cote Sauvage - La Pointe Espagnole</a> <nobr>at&nbsp;<a href="//www.surf-forecast.com/">surf-forecast.com</a></nobr>.</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- ================= FOOTER ================= -->
+  <footer>
+    <div class="footer-grid">
+      <nav class="footer-links">
+        <a href="#shop">SHOP</a>
+        <a href="#about">ABOUT</a>
+        <a href="#team">TEAM</a>
+      </nav>
+
+      <span class="footer-divider" aria-hidden="true"></span>
+
+      <div class="footer-contact">
+        <h3>Contact</h3>
+        <ul>
+          <li>
+            @exempleinstagram.
+            <svg viewBox="0 0 24 24" fill="none"><rect x="3" y="3" width="18" height="18" rx="5" stroke="currentColor" stroke-width="1.6"/><circle cx="12" cy="12" r="4" stroke="currentColor" stroke-width="1.6"/><circle cx="17.5" cy="6.5" r="1" fill="currentColor"/></svg>
+          </li>
+          <li>
+            @exempleinstagram.
+            <svg viewBox="0 0 24 24" fill="none"><path d="M14 3v11.5a3.5 3.5 0 1 1-2-3.16V3h2z" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/><path d="M14 3c0 2.5 2 4 4 4" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg>
+          </li>
+          <li>
+            @exempleinstagram.
+            <svg viewBox="0 0 24 24" fill="none"><rect x="3" y="5" width="18" height="14" rx="2" stroke="currentColor" stroke-width="1.6"/><path d="M3 6l9 7 9-7" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          </li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="footer-bottom">© 2026 Cobalt slide co.</div>
+  </footer>
+
+  <script>
+    (function(){
+      var hamburgerBtn = document.getElementById('hamburgerBtn');
+      var slideMenu = document.getElementById('slideMenu');
+      var overlay = document.getElementById('slideMenuOverlay');
+      var closeBtn = document.getElementById('slideMenuClose');
+
+      function openMenu(){
+        slideMenu.classList.add('open');
+        overlay.classList.add('open');
+        slideMenu.setAttribute('aria-hidden', 'false');
+        hamburgerBtn.setAttribute('aria-expanded', 'true');
+        document.body.style.overflow = 'hidden';
+      }
+
+      function closeMenu(){
+        slideMenu.classList.remove('open');
+        overlay.classList.remove('open');
+        slideMenu.setAttribute('aria-hidden', 'true');
+        hamburgerBtn.setAttribute('aria-expanded', 'false');
+        document.body.style.overflow = '';
+      }
+
+      hamburgerBtn.addEventListener('click', function(){
+        if(slideMenu.classList.contains('open')){
+          closeMenu();
+        } else {
+          openMenu();
+        }
+      });
+
+      closeBtn.addEventListener('click', closeMenu);
+      overlay.addEventListener('click', closeMenu);
+
+      // Ferme le menu si on repasse en affichage PC (largeur > 640px)
+      window.addEventListener('resize', function(){
+        if(window.innerWidth > 640){
+          closeMenu();
+        }
+      });
+
+      document.addEventListener('keydown', function(e){
+        if(e.key === 'Escape'){
+          closeMenu();
+        }
+      });
+    })();
+  </script>
+
+</body>
+</html>
